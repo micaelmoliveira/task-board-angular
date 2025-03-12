@@ -26,38 +26,40 @@ export class TaskService {
   }
 
   public createTask(task: Partial<Task>): Observable<Task> {
-    return this._httpClient.post<Task>(`${this._apiUrl}/tasks`, task);
+    return this._httpClient
+      .post<Task>(`${this._apiUrl}/tasks`, task)
+      .pipe(tap(tasks => this.insertTaskInTaskList(tasks)));
   }
 
   public updateTask(updateTask: Task): Observable<Task> {
-    return this._httpClient.put<Task>(
-      `${this._apiUrl}/tasks/${updateTask.id}`,
-      updateTask
-    );
+    return this._httpClient
+      .put<Task>(`${this._apiUrl}/tasks/${updateTask.id}`, updateTask)
+      .pipe(tap(task => this.updateTaskInTaskList(task)));
   }
 
   public updateTaskStatus(
     taskId: string,
     isCompleted: boolean
   ): Observable<Task> {
-    return this._httpClient.patch<Task>(
-      `${this._apiUrl}/tasks/${taskId}`,
-      isCompleted
-    );
+    return this._httpClient
+      .patch<Task>(`${this._apiUrl}/tasks/${taskId}`, isCompleted)
+      .pipe(tap(task => this.updateTaskInTaskList(task)));
   }
 
   public deleteTask(taskId: string): Observable<Task> {
-    return this._httpClient.delete<Task>(`${this._apiUrl}/tasks/${taskId}`);
+    return this._httpClient
+      .delete<Task>(`${this._apiUrl}/tasks/${taskId}`)
+      .pipe(tap(() => this.deleteTaskInTaskList(taskId)));
   }
 
-  public insertTaskInTaskList(newTask: Task): void {
+  private insertTaskInTaskList(newTask: Task): void {
     const updatedTask = [...this.tasks(), newTask];
     const sortedTasks = this.getSortedTasks(updatedTask);
 
     this.tasks.set(sortedTasks);
   }
 
-  public updateTaskInTaskList(updateTask: Task): void {
+  private updateTaskInTaskList(updateTask: Task): void {
     this.tasks.update(tasks => {
       const removeUpdatedTaskFromTaskList = tasks.filter(
         task => task.id !== updateTask.id
@@ -68,11 +70,11 @@ export class TaskService {
     });
   }
 
-  public deleteTaskInTaskList(taskId: string): void {
+  private deleteTaskInTaskList(taskId: string): void {
     this.tasks.update(tasks => tasks.filter(task => task.id !== taskId));
   }
 
-  public getSortedTasks(tasks: Task[]): Task[] {
-    return tasks.sort((a, b) => a.title.localeCompare(b.title));
+  private getSortedTasks(tasks: Task[]): Task[] {
+    return tasks.sort((a, b) => a.title?.localeCompare(b.title));
   }
 }

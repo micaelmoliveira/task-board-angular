@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ColorsListComponent } from './colors-list.component';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('ColorsListComponent', () => {
   let component: ColorsListComponent;
@@ -8,9 +9,9 @@ describe('ColorsListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ColorsListComponent]
-    })
-    .compileComponents();
+      imports: [ColorsListComponent],
+      providers: [provideHttpClient()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ColorsListComponent);
     component = fixture.componentInstance;
